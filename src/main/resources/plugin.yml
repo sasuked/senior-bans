@@ -1,0 +1,6 @@
+name: SeniorBans
+version: '${version}'
+main: io.github.sasuked.seniorbans.SeniorBans
+description: SeniorBans is a simple and easy to use ban plugin.
+author: Sasuked
+api-version: 1.13

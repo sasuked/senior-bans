@@ -1,9 +1,15 @@
 package io.github.sasuked.seniorbans.command;
 
 import io.github.sasuked.seniorbans.SeniorBans;
+import io.github.sasuked.seniorbans.ban.PlayerBan;
+import io.github.sasuked.seniorbans.util.Players;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.UUID;
 
 public class UnbanCommand extends Command {
 
@@ -26,7 +32,30 @@ public class UnbanCommand extends Command {
       return false;
     }
 
+    UUID bannedPlayerId = Players.fetchPlayerUniqueId(args[0]);
+    if (bannedPlayerId == null) {
+      sender.sendMessage("§cThis player does not exist.");
+      return false;
+    }
 
+    List<PlayerBan> activePlayerBans = plugin.getBanRegistry().getActivePlayerBans(bannedPlayerId);
+    if (activePlayerBans.isEmpty()) {
+      sender.sendMessage("§cThis player is not banned.");
+      return false;
+    } else {
+      plugin.getBanRepository()
+        .deleteMany(activePlayerBans)
+        .whenComplete((deleted, throwable) -> {
+          if (throwable != null) {
+            throwable.printStackTrace();
+          } else if (deleted) {
+            plugin.getBanRegistry().removePlayerBans(activePlayerBans);
+            sender.sendMessage("§aYou have unbanned " + args[0] + ".");
+          } else {
+            sender.sendMessage("§cAn error occurred while unbanning " + args[0] + ".");
+          }
+        });
+    }
 
     return false;
   }

@@ -3,7 +3,7 @@ package io.github.sasuked.seniorbans.command;
 import com.google.common.collect.ImmutableMap;
 import io.github.sasuked.seniorbans.SeniorBans;
 import io.github.sasuked.seniorbans.ban.PlayerBan;
-import io.github.sasuked.seniorbans.gui.HistoryView;
+import io.github.sasuked.seniorbans.gui.PlayerHistoryMenu;
 import io.github.sasuked.seniorbans.util.Players;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,7 +23,11 @@ public class HistoryCommand extends Command {
   }
 
   @Override
-  public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+  public boolean execute(
+    @NotNull CommandSender sender,
+    @NotNull String commandLabel,
+    @NotNull String[] args
+  ) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage("§cYou must be a player to use this command.");
       return false;
@@ -46,13 +50,13 @@ public class HistoryCommand extends Command {
     }
 
     List<PlayerBan> playerBans = plugin.getBanRegistry().getPlayerBans(playerId);
+    if (playerBans.isEmpty()) {
+      sender.sendMessage("§cThis player has no history.");
+      return false;
+    }
 
-    plugin.getViewFrame().open(HistoryView.class, player, ImmutableMap.of(
-      "banList", playerBans,
-      "playerName", args[0],
-      "playerId", playerId
-    ));
-
+    var menu = new PlayerHistoryMenu(Players.fetchPlayerName(playerId), playerBans);
+    menu.open(player);
     return false;
   }
 }

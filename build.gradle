@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 group = 'io.github.sasuked'
@@ -7,18 +8,30 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    maven {
-        name = "spigotmc-repo"
-        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
-    }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
-    }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://oss.sonatype.org/content/groups/public/' }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-compileOnly "org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT"
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    compileOnly 'org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT'
+
+    // jetbrains-annotations
+    implementation 'org.jetbrains:annotations:22.0.0'
+
+
+    implementation group: 'com.j256.ormlite', name: 'ormlite-jdbc', version: '4.48'
+    implementation 'fr.mrmicky:FastInv:3.0.3'
+
+}
+
+shadowJar {
+    relocate('com.j256.ormlite', 'io.github.sasuked.seniorbans.ormlite')
+    relocate('fr.mrmicky.fastinv', 'io.github.sasuked.seniorbans.fastinv')
+    relocate('org.jetbrains.annotations', 'io.github.sasuked.seniorbans.annotations')
 }
 
 def targetJavaVersion = 17
@@ -31,11 +44,11 @@ java {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release = targetJavaVersion
-    }
+// utf8
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
+
 
 processResources {
     def props = [version: version]
