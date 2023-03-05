@@ -39,6 +39,9 @@ public class PlayerBan {
   @DatabaseField(columnName = "creation_time")
   private long creationTime;
 
+  @DatabaseField(columnName = "active")
+  private boolean active;
+
   //  -1 = permanent
   @DatabaseField(columnName = "expiration_time")
   private long expirationTime;
@@ -47,24 +50,23 @@ public class PlayerBan {
     return expirationTime == -1;
   }
 
-  public boolean isActive() {
-    return isPermanent() || expirationTime > System.currentTimeMillis();
+  public boolean isExpired() {
+    return !isPermanent() && expirationTime < System.currentTimeMillis();
   }
 
 
   public ItemStack asItemStack() {
-
     return ItemBuilder.fromHead(bannedPlayerId)
       .name("§c" + Players.fetchPlayerName(bannedPlayerId))
       .lore(
         "",
-        "§7Reason: §c" + reason,
-        "§7Author: §c" + Players.fetchPlayerName(authorId),
-        "§7Creation time: §c" + getFormattedCreationTime(),
-        isActive() ? "§7Expiration time: §c" + getFormattedExpirationTime() : "§7Permanent",
-        "§7Active: §c" + isActive(),
+        " §7Reason: §c" + reason,
+        " §7Author: §c" + Players.fetchPlayerName(authorId),
+        " §7Creation time: §c" + getFormattedCreationTime(),
+        " §7Expiration time: §c" + getFormattedExpirationTime(),
+        " §7Active: " + (isActive() ? "§aYes" : "§cNo"),
         "",
-        "§8Ban id: §7" + uniqueId.toString()
+        " §8Ban id: " + uniqueId.toString()
       )
       .build();
   }
@@ -74,6 +76,7 @@ public class PlayerBan {
     if (expirationTime == -1) {
       return "Permanent";
     }
+
     return DATE_FORMAT.format(new Date(expirationTime));
   }
 

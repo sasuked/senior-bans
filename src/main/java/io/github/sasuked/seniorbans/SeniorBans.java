@@ -1,6 +1,7 @@
 package io.github.sasuked.seniorbans;
 
 import fr.mrmicky.fastinv.FastInvManager;
+import io.github.sasuked.seniorbans.ban.PlayerBanExpiringTask;
 import io.github.sasuked.seniorbans.ban.PlayerBanRegistry;
 import io.github.sasuked.seniorbans.ban.PlayerBanRepository;
 import io.github.sasuked.seniorbans.command.BanCommand;
@@ -39,6 +40,9 @@ public class SeniorBans extends JavaPlugin {
           }
         });
 
+
+      var task = new PlayerBanExpiringTask(this);
+      task.start();
 
       Bukkit.getPluginManager().registerEvents(new LoginListener(this), this);
 

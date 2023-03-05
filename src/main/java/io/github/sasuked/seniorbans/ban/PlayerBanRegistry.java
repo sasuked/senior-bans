@@ -28,10 +28,11 @@ public class PlayerBanRegistry {
       .anyMatch(PlayerBan::isActive);
   }
 
-  public PlayerBan getMostRecentBan(UUID playerId) {
+  public PlayerBan getMostRecentActiveBan(UUID playerId) {
     return playerBanMap.values()
       .stream()
       .filter(playerBan -> playerBan.getBannedPlayerId().equals(playerId))
+      .filter(PlayerBan::isActive)
       .max(Comparator.comparingLong(PlayerBan::getCreationTime))
       .orElse(null);
   }

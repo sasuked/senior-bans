@@ -4,6 +4,7 @@ import io.github.sasuked.seniorbans.SeniorBans;
 import io.github.sasuked.seniorbans.ban.PlayerBan;
 import io.github.sasuked.seniorbans.util.ParseableTime;
 import io.github.sasuked.seniorbans.util.ParseableTime.TimeParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -61,12 +62,12 @@ public class BanCommand extends Command {
       banTime = ParseableTime.parseString(args[1]);
     } catch (TimeParseException ex) {
       // if the duration is not valid, we assume the reason is the first argument
-      reason = String.join(" ", args[1].split(" "));
+      reason = StringUtils.join(args, " ", 1, args.length);
     }
 
     // if the duration is valid, we assume the reason is the second argument
     if (banTime != null) {
-      reason = args.length > 2 ? String.join(" ", args[2].split(" ")) : "No reason specified.";
+      reason = args.length == 2 ? "No reason specified." : StringUtils.join(args, " ", 2, args.length);
     }
 
     var playerBan = PlayerBan.builder()
@@ -74,6 +75,7 @@ public class BanCommand extends Command {
       .bannedPlayerId(target.getUniqueId())
       .authorId(sender instanceof Player ? ((Player) sender).getUniqueId() : null)
       .creationTime(System.currentTimeMillis())
+      .active(true)
       .expirationTime(banTime != null ? (System.currentTimeMillis() + banTime.toMilliseconds()) : -1)
       .reason(reason)
       .build();
@@ -85,7 +87,7 @@ public class BanCommand extends Command {
         if (throwable != null) {
           throwable.printStackTrace();
           sender.sendMessage("§cAn error occurred while trying to ban the player.");
-        } else if (result){
+        } else if (result) {
           plugin.getBanRegistry().register(playerBan);
           sender.sendMessage("§aPlayer banned successfully.");
           Bukkit.getScheduler().runTask(plugin, () -> target.kickPlayer("§cYou have been banned from this server."));
@@ -96,4 +98,6 @@ public class BanCommand extends Command {
 
     return false;
   }
+
+
 }

@@ -5,7 +5,6 @@ import io.github.sasuked.seniorbans.ban.PlayerBan;
 import io.github.sasuked.seniorbans.util.Players;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -43,16 +42,17 @@ public class UnbanCommand extends Command {
       sender.sendMessage("§cThis player is not banned.");
       return false;
     } else {
+      activePlayerBans.forEach(ban -> ban.setActive(false));
+
+
+      // do not delete the ban from the database, just set the end time to now
       plugin.getBanRepository()
-        .deleteMany(activePlayerBans)
-        .whenComplete((deleted, throwable) -> {
+        .updateMany(activePlayerBans)
+        .whenComplete((unused, throwable) -> {
           if (throwable != null) {
-            throwable.printStackTrace();
-          } else if (deleted) {
-            plugin.getBanRegistry().removePlayerBans(activePlayerBans);
-            sender.sendMessage("§aYou have unbanned " + args[0] + ".");
-          } else {
             sender.sendMessage("§cAn error occurred while unbanning " + args[0] + ".");
+          } else {
+            sender.sendMessage("§aYou have unbanned " + args[0] + ".");
           }
         });
     }

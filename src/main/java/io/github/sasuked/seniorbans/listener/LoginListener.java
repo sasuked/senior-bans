@@ -9,8 +9,6 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 
 public class LoginListener implements Listener {
 
@@ -22,8 +20,8 @@ public class LoginListener implements Listener {
 
   @EventHandler
   public void handlePlayerLogin(AsyncPlayerPreLoginEvent event) {
-    PlayerBan mostRecentBan = plugin.getBanRegistry().getMostRecentBan(event.getUniqueId());
-    if (mostRecentBan == null || !mostRecentBan.isActive()) {
+    PlayerBan mostRecentBan = plugin.getBanRegistry().getMostRecentActiveBan(event.getUniqueId());
+    if (mostRecentBan == null) {
       return;
     }
 

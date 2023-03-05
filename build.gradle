@@ -26,6 +26,7 @@ dependencies {
     implementation group: 'com.j256.ormlite', name: 'ormlite-jdbc', version: '4.48'
     implementation 'fr.mrmicky:FastInv:3.0.3'
 
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 }
 
 shadowJar {

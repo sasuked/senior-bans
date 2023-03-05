@@ -77,4 +77,10 @@ public class PlayerBanRepository {
       }
     }, executor);
   }
+
+  public CompletableFuture<Void> updateMany(List<PlayerBan> playerBans) {
+    return CompletableFuture.allOf(playerBans.stream()
+      .map(this::updateBan)
+      .toArray(CompletableFuture[]::new));
+  }
 }
